@@ -82,3 +82,38 @@ export const updateUser = async (
     res.end(JSON.stringify({ error: 'Internal Server Error' }));
   }
 };
+
+export const destroyUser = async (
+  req: IncomingMessage,
+  res: ServerResponse,
+  userId: string,
+) => {
+  try {
+    const removedUser = await User.destroyUser(userId);
+
+    res.writeHead(200, { 'Content-type': 'Application/json' });
+    res.end(
+      JSON.stringify({
+        message: 'User removed successfully',
+      }),
+    );
+  } catch (error: unknown) {
+    if (error instanceof Error) {
+      if (error.message === 'User not found') {
+        res.writeHead(404, { 'Content-type': 'Application/json' });
+        res.end(JSON.stringify({ error: 'User not found' }));
+      } else {
+        res.writeHead(500, { 'Content-type': 'application/json' });
+        res.end(
+          JSON.stringify({
+            error: 'Internal Server Error',
+            message: error.message,
+          }),
+        );
+      }
+    } else {
+      res.writeHead(500, { 'Content-type': 'application/json' });
+      res.end(JSON.stringify({ error: 'An unexpected error occurred' }));
+    }
+  }
+};

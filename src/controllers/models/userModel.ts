@@ -63,4 +63,23 @@ export class User {
       }
     });
   }
+
+  static destroyUser(id: string): Promise<UserType> {
+    return new Promise((resolve, reject) => {
+      try {
+        const userIndex = users.findIndex((user) => user.id === id);
+
+        if (userIndex === -1) {
+          reject(new Error('User not found'));
+          return;
+        }
+
+        const removedUser = users.splice(userIndex, 1)[0];
+
+        resolve(removedUser);
+      } catch (error) {
+        reject(error);
+      }
+    });
+  }
 }
