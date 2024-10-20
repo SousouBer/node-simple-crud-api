@@ -1,21 +1,47 @@
 import { users } from '../../db/users';
-import { User } from '../../types/types';
+import { UserType } from '../../types/types';
 import { v4 as uuidv4 } from 'uuid';
 
-export const usersIndex = () => {
-  return new Promise((resolve, reject) => {
-    resolve(users);
-  });
-};
+export class User {
+  readonly id: string;
 
-export const createUser = (user: User) => {
-  return new Promise((resolve, reject) => {
-    const newUser = {
-      id: uuidv4(),
-      ...user,
-    };
+  constructor(
+    public username: string,
+    public age: number,
+    public hobbies: string[],
+  ) {
+    this.id = uuidv4();
+    this.username = username;
+    this.age = age;
+    this.hobbies = hobbies;
+  }
 
-    users.push(newUser);
-    resolve(newUser);
-  });
-};
+  static getUsers(): Promise<UserType[]> {
+    return new Promise((resolve, reject) => {
+      resolve(users);
+    });
+  }
+
+  store(): Promise<UserType> {
+    return new Promise((resolve, reject) => {
+      try {
+        users.push(this);
+        resolve(this);
+      } catch (error) {
+        reject(error);
+      }
+    });
+  }
+
+  static getUser(id: string): Promise<UserType> {
+    return new Promise((resolve, reject) => {
+      try {
+        const user = users.find((user) => user.id === id);
+
+        resolve(user as UserType);
+      } catch (error) {
+        reject(error);
+      }
+    });
+  }
+}

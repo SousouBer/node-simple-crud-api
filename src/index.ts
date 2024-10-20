@@ -1,8 +1,9 @@
 import http, { IncomingMessage, ServerResponse } from 'node:http';
 import dotenv from 'dotenv';
 
-import { getUsers } from './controllers/userController';
+import { getUser, getUsers } from './controllers/userController';
 import { storeUser } from './controllers/userController';
+import { extractUserId } from './utils/extractUserId';
 
 dotenv.config();
 
@@ -14,6 +15,12 @@ const server = http.createServer(
       getUsers(req, res);
     } else if (req.url === '/api/users' && req.method === 'POST') {
       storeUser(req, res);
+    } else if (req.url?.startsWith('/api/users') && req.method === 'GET') {
+      const userId = extractUserId(req.url as string);
+
+      if (userId) {
+        getUser(req, res, userId);
+      }
     }
   },
 );
