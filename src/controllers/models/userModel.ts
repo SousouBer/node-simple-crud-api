@@ -44,4 +44,23 @@ export class User {
       }
     });
   }
+
+  static updateUser(id: string, data: Partial<UserType>): Promise<UserType> {
+    return new Promise((resolve, reject) => {
+      try {
+        const userIndex = users.findIndex((user) => user.id === id);
+
+        if (userIndex === -1) {
+          reject(new Error('User not found'));
+          return;
+        }
+
+        users[userIndex] = { ...users[userIndex], ...data };
+
+        resolve(users[userIndex]);
+      } catch (error) {
+        reject(error);
+      }
+    });
+  }
 }

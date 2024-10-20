@@ -52,3 +52,33 @@ export const getUser = async (
     res.end(JSON.stringify({ error: 'Internal Server Error' }));
   }
 };
+
+export const updateUser = async (
+  req: IncomingMessage,
+  res: ServerResponse,
+  userId: string,
+) => {
+  try {
+    let body = '';
+
+    req.on('data', (chunk) => {
+      body += chunk.toString();
+    });
+
+    req.on('end', async () => {
+      const { username, age, hobbies } = JSON.parse(body);
+
+      const updatedUser = await User.updateUser(userId, {
+        username,
+        age,
+        hobbies,
+      });
+
+      res.writeHead(200, { 'Content-type': 'Application/json' });
+      res.end(JSON.stringify(updatedUser));
+    });
+  } catch (error) {
+    res.writeHead(500, { 'Content-type': 'application/json' });
+    res.end(JSON.stringify({ error: 'Internal Server Error' }));
+  }
+};
