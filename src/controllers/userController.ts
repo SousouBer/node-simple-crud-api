@@ -152,9 +152,19 @@ export const destroyUser = async (
   userId: string,
 ) => {
   try {
+    if (!validateId(userId)) {
+      res.writeHead(400, { 'Content-type': 'Application/json' });
+      res.end(
+        JSON.stringify({
+          message: 'User UUID is invalid',
+        }),
+      );
+      return;
+    }
+
     const removedUser = await User.destroyUser(userId);
 
-    res.writeHead(204, { 'Content-type': 'Application/json' });
+    res.writeHead(200, { 'Content-type': 'Application/json' });
     res.end(
       JSON.stringify({
         message: 'User removed successfully',

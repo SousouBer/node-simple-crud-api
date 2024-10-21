@@ -38,6 +38,9 @@ const server = http.createServer(
       if (userId) {
         destroyUser(req, res, userId);
       }
+    } else {
+      res.writeHead(404, { 'Content-type': 'application/json' });
+      res.end(JSON.stringify({ error: 'Invalid method or url' }));
     }
   },
 );
