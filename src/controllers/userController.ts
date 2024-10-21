@@ -1,5 +1,7 @@
 import { IncomingMessage, ServerResponse } from 'http';
 
+import { validateId } from '../utils/validateUserId';
+
 import { User } from './models/userModel';
 
 export const getUsers = async (req: IncomingMessage, res: ServerResponse) => {
@@ -43,13 +45,38 @@ export const getUser = async (
   userId: string,
 ) => {
   try {
+    if (!validateId(userId)) {
+      res.writeHead(400, { 'Content-type': 'Application/json' });
+      res.end(
+        JSON.stringify({
+          message: 'User UUID is invalid',
+        }),
+      );
+      return;
+    }
+
     const user = await User.getUser(userId as string);
 
     res.writeHead(200, { 'Content-type': 'Application/json' });
     res.end(JSON.stringify(user));
-  } catch (error) {
-    res.writeHead(500, { 'Content-type': 'application/json' });
-    res.end(JSON.stringify({ error: 'Internal Server Error' }));
+  } catch (error: unknown) {
+    if (error instanceof Error) {
+      if (error.message === 'User not found') {
+        res.writeHead(404, { 'Content-type': 'Application/json' });
+        res.end(JSON.stringify({ error: 'User not found' }));
+      } else {
+        res.writeHead(500, { 'Content-type': 'application/json' });
+        res.end(
+          JSON.stringify({
+            error: 'Internal Server Error',
+            message: error.message,
+          }),
+        );
+      }
+    } else {
+      res.writeHead(500, { 'Content-type': 'application/json' });
+      res.end(JSON.stringify({ error: 'An unexpected error occurred' }));
+    }
   }
 };
 

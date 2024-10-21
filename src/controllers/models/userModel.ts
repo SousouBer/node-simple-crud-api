@@ -38,6 +38,11 @@ export class User {
       try {
         const user = users.find((user) => user.id === id);
 
+        if (!user) {
+          reject(new Error('User not found'));
+          return;
+        }
+
         resolve(user as UserType);
       } catch (error) {
         reject(error);
